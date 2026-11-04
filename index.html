@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gehst du mit mir aus?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+  /* Layout: one soft card centered on a meadow-green ground, a little frog mascot on top, step dots below.
+     Single deliberate pastel-green look (as requested), colors set explicitly for any host theme. */
+  :root {
+    --ground: #e6f4e3;
+    --ground-2: #d3ecd2;
+    --card: #fbfffa;
+    --ink: #2f4a3a;
+    --ink-soft: #5f7d69;
+    --mint: #a8dbb0;
+    --sage: #7fbf8c;
+    --leaf: #4f9a62;
+    --blush: #f6c1c7;
+    --line: #cfe6d1;
+    --display: "Caveat", "Comic Sans MS", cursive;
+    --body: "Nunito", "Segoe UI", system-ui, sans-serif;
+    color-scheme: light;
+  }
+  [hidden] { display: none !important; }
+  img { max-width: 100%; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background:
+      radial-gradient(circle at 15% 20%, #f1faef 0 18%, transparent 19%),
+      radial-gradient(circle at 85% 80%, #f1faef 0 14%, transparent 15%),
+      radial-gradient(circle at 80% 15%, var(--ground-2) 0 9%, transparent 10%),
+      var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    display: grid;
+    place-items: center;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 24px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+  .card {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: 28px;
+    box-shadow: 0 14px 0 -6px var(--mint), 0 20px 40px rgba(79, 154, 98, .18);
+    padding: 28px 28px 24px;
+    box-sizing: border-box;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .frog { width: 150px; max-width: 60%; height: auto; margin-top: -86px; }
+  .frog .pupil { transition: transform .25s ease; }
+  .eyebrow {
+    font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--leaf); margin: 0;
+  }
+  h1 {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(34px, 8vw, 44px); line-height: 1.05;
+    margin: 0; text-wrap: balance; color: var(--ink);
+  }
+  .sub { margin: 0; color: var(--ink-soft); line-height: 1.5; max-width: 34ch; }
+  .buttons {
+    display: flex; gap: 14px; justify-content: center; align-items: center;
+    flex-wrap: wrap; margin-top: 6px; min-height: 64px;
+  }
+  button {
+    font-family: var(--body); font-weight: 800; font-size: 17px;
+    border-radius: 999px; cursor: pointer; border: 2px solid transparent;
+    padding: 13px 26px;
+  }
+  button:focus-visible { outline: 3px solid var(--leaf); outline-offset: 3px; }
+  .yes {
+    background: var(--sage); color: #fff; border-color: var(--leaf);
+    box-shadow: 0 5px 0 var(--leaf);
+    transition: transform .2s ease, box-shadow .15s ease;
+    transform: scale(var(--grow, 1));
+  }
+  .yes:hover { background: #74b682; }
+  .yes:active { box-shadow: 0 2px 0 var(--leaf); transform: scale(var(--grow, 1)) translateY(3px); }
+  .no {
+    background: #fff; color: var(--ink-soft); border-color: var(--line);
+    min-width: 150px;
+    transition: transform .28s cubic-bezier(.3, 1.6, .5, 1);
+    position: relative; z-index: 20;
+    touch-action: none;
+  }
+  .hint {
+    margin: 0; min-height: 1.4em; font-family: var(--display); font-size: 22px; color: var(--leaf);
+  }
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; margin-top: 4px; }
+  .option {
+    background: #f3faf1; color: var(--ink); border: 2px solid var(--line); border-radius: 18px;
+    padding: 14px 10px; font-size: 16px; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    transition: background .15s, border-color .15s, transform .15s;
+  }
+  .option:hover { background: #e4f4e3; border-color: var(--sage); transform: translateY(-2px); }
+  .option svg { width: 34px; height: 34px; }
+  .dots { display: flex; gap: 8px; margin-top: 8px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line); transition: background .3s, width .3s; }
+  .dot.on { background: var(--sage); width: 22px; border-radius: 6px; }
+  .step-label { font-size: 13px; color: var(--ink-soft); margin: 0; font-variant-numeric: tabular-nums; }
+  .ticket {
+    width: 100%; border: 2px dashed var(--sage); border-radius: 18px; padding: 14px 16px; box-sizing: border-box;
+    background: #f3faf1; text-align: left; display: grid; gap: 4px;
+  }
+  .ticket b { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--leaf); }
+  .ticket span { font-family: var(--display); font-size: 28px; line-height: 1.1; }
+  .ghost { background: transparent; color: var(--ink-soft); border-color: var(--line); font-size: 15px; padding: 10px 20px; }
+  .ghost:hover { border-color: var(--sage); color: var(--ink); }
+  .pop { animation: pop .45s cubic-bezier(.3, 1.5, .5, 1); }
+  @keyframes pop { from { transform: scale(.94); opacity: .4; } to { transform: scale(1); opacity: 1; } }
+  .heart { position: fixed; top: -40px; pointer-events: none; z-index: 30; animation: fall linear forwards; }
+  @keyframes fall { to { transform: translateY(calc(100vh + 80px)) rotate(var(--rot)); } }
+  @media (max-width: 420px) {
+    .card { padding: 24px 18px 20px; }
+    .options { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pop, .heart { animation: none; }
+    .heart { display: none; }
+    .no { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<main class="card" id="card">
+  <svg class="frog" id="frog" viewBox="0 0 160 120" aria-hidden="true">
+    <ellipse cx="80" cy="82" rx="62" ry="36" fill="#a8dbb0" stroke="#4f9a62" stroke-width="3"/>
+    <circle cx="50" cy="44" r="22" fill="#a8dbb0" stroke="#4f9a62" stroke-width="3"/>
+    <circle cx="110" cy="44" r="22" fill="#a8dbb0" stroke="#4f9a62" stroke-width="3"/>
+    <ellipse cx="80" cy="74" rx="56" ry="26" fill="#a8dbb0"/>
+    <circle cx="50" cy="44" r="13" fill="#fff"/>
+    <circle cx="110" cy="44" r="13" fill="#fff"/>
+    <circle class="pupil" cx="50" cy="45" r="6.5" fill="#2f4a3a"/>
+    <circle class="pupil" cx="110" cy="45" r="6.5" fill="#2f4a3a"/>
+    <circle cx="52.5" cy="42" r="2" fill="#fff"/>
+    <circle cx="112.5" cy="42" r="2" fill="#fff"/>
+    <ellipse cx="36" cy="82" rx="10" ry="6" fill="#f6c1c7"/>
+    <ellipse cx="124" cy="82" rx="10" ry="6" fill="#f6c1c7"/>
+    <path id="mouth" d="M62 80 Q80 96 98 80" fill="none" stroke="#2f4a3a" stroke-width="3.5" stroke-linecap="round"/>
+  </svg>
+  <div id="content" style="display:flex;flex-direction:column;align-items:center;gap:14px;width:100%"></div>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+</main>
+
+<script>
+(() => {
+  const steps = [
+    { eyebrow: "Eine kleine Frage", title: "Hallo du! Darf ich dich etwas fragen?", sub: "Es dauert nur ein paar Klicks. Versprochen.", yes: "Ja, klar" },
+    { eyebrow: "Frage 1", title: "Findest du mich ein kleines bisschen süß?", sub: "Ganz ehrlich antworten. Der Frosch schaut zu.", yes: "Ja, ein bisschen" },
+    { eyebrow: "Frage 2", title: "Hast du bald einen freien Abend?", sub: "Oder einen Nachmittag. Ich bin da ganz flexibel.", yes: "Ja, hab ich" },
+    { eyebrow: "Die wichtigste Frage", title: "Gehst du mit mir auf ein Date?", sub: "Überleg gut. Oder auch nicht, die Antwort ist eh klar.", yes: "Ja, sehr gern!" },
+    { eyebrow: "Fast geschafft", title: "Juhu! Worauf hast du Lust?", sub: "Such dir aus, was wir zusammen machen.", choose: true },
+    { final: true }
+  ];
+  const activities = [
+    { name: "Kaffee & Kuchen", text: "Kaffee und Kuchen", icon: '<path d="M6 14h18v6a8 8 0 0 1-8 8h-2a8 8 0 0 1-8-8z" fill="#a8dbb0" stroke="#4f9a62" stroke-width="2"/><path d="M24 16h2a4 4 0 0 1 0 8h-2" fill="none" stroke="#4f9a62" stroke-width="2"/><path d="M11 6c0 3 3 3 3 6M17 6c0 3 3 3 3 6" fill="none" stroke="#7fbf8c" stroke-width="2" stroke-linecap="round"/>' },
+    { name: "Picknick im Park", text: "Picknick im Park", icon: '<path d="M5 14h24l-3 14H8z" fill="#f6c1c7" stroke="#4f9a62" stroke-width="2"/><path d="M10 14a7 7 0 0 1 14 0" fill="none" stroke="#4f9a62" stroke-width="2"/><path d="M7 20h20" stroke="#fff" stroke-width="2"/>' },
+    { name: "Kino-Abend", text: "Kino-Abend", icon: '<rect x="5" y="9" width="24" height="18" rx="3" fill="#a8dbb0" stroke="#4f9a62" stroke-width="2"/><path d="M14 13l7 5-7 5z" fill="#fff"/>' },
+    { name: "Spaziergang mit Eis", text: "Spaziergang mit Eis", icon: '<path d="M11 15h12l-6 15z" fill="#f3d9a8" stroke="#4f9a62" stroke-width="2" stroke-linejoin="round"/><circle cx="14" cy="12" r="5" fill="#f6c1c7" stroke="#4f9a62" stroke-width="2"/><circle cx="20" cy="12" r="5" fill="#a8dbb0" stroke="#4f9a62" stroke-width="2"/>' }
+  ];
+  const noTexts = ["Nein", "Sicher?", "Nö, hier nicht", "Zu langsam!", "Fast erwischt", "Keine Chance", "Nimm lieber Ja", "Ich bin schneller", "Hihi", "Versuch's weiter"];
+  const hints = ["", "", "Hoppla, der ist weggehüpft.", "Der Nein-Knopf ist heute etwas schüchtern.", "Ja ist übrigens immer da.", "Der Frosch glaubt, du meinst Ja.", "Du gibst nicht auf, oder?"];
+  const mouths = {
+    happy: "M62 80 Q80 96 98 80",
+    big: "M60 78 Q80 104 100 78 Z",
+    worried: "M64 88 Q80 78 96 88",
+    oh: "M74 84 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0"
+  };
+
+  const content = document.getElementById("content");
+  const dotsEl = document.getElementById("dots");
+  const mouth = document.getElementById("mouth");
+  const pupils = document.querySelectorAll(".pupil");
+  const questionCount = steps.length - 1;
+  let step = 0, tries = 0, choice = null, noBtn = null, yesBtn = null, moodTimer = null;
+  let tx = 0, ty = 0;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  for (let i = 0; i < questionCount; i++) { const d = document.createElement("span"); d.className = "dot"; dotsEl.appendChild(d); }
+
+  function setMood(m, ms) {
+    mouth.setAttribute("d", mouths[m]);
+    mouth.setAttribute("fill", m === "big" ? "#e88a96" : (m === "oh" ? "#2f4a3a" : "none"));
+    clearTimeout(moodTimer);
+    if (ms) moodTimer = setTimeout(() => setMood(step >= 4 ? "big" : "happy"), ms);
+  }
+
+  function render() {
+    const s = steps[step];
+    tries = 0; tx = ty = 0; noBtn = yesBtn = null;
+    [...dotsEl.children].forEach((d, i) => d.classList.toggle("on", i <= step && !s.final));
+    dotsEl.hidden = !!s.final;
+    content.classList.remove("pop"); void content.offsetWidth; if (!reduce) content.classList.add("pop");
+
+    if (s.final) {
+      setMood("big");
+      content.innerHTML = `
+        <p class="eyebrow">Abgemacht</p>
+        <h1>Es ist ein Date!</h1>
+        <p class="sub">Ich freu mich riesig auf dich. Ich melde mich mit Tag und Uhrzeit.</p>
+        <div class="ticket"><b>Unser Plan</b><span>${choice.text}</span><small style="color:var(--ink-soft)">Mach am besten einen Screenshot und schick ihn mir.</small></div>
+        <button class="ghost" id="restart" type="button">Nochmal von vorn</button>`;
+      document.getElementById("restart").onclick = () => { step = 0; choice = null; render(); };
+      hearts(28);
+      return;
+    }
+
+    if (s.choose) {
+      setMood("big");
+      content.innerHTML = `
+        <p class="eyebrow">${s.eyebrow}</p>
+        <h1>${s.title}</h1>
+        <p class="sub">${s.sub}</p>
+        <div class="options">${activities.map((a, i) => `
+          <button class="option" type="button" id="opt-${i}" data-i="${i}">
+            <svg viewBox="0 0 34 34" aria-hidden="true">${a.icon}</svg>${a.name}
+          </button>`).join("")}</div>
+        <p class="step-label">Schritt ${step + 1} von ${questionCount}</p>`;
+      content.querySelectorAll(".option").forEach(b => b.onclick = () => { choice = activities[+b.dataset.i]; step++; render(); });
+      hearts(10);
+      return;
+    }
+
+    setMood("happy");
+    content.innerHTML = `
+      <p class="eyebrow">${s.eyebrow}</p>
+      <h1>${s.title}</h1>
+      <p class="sub">${s.sub}</p>
+      <div class="buttons">
+        <button class="yes" id="yes-${step}" type="button">${s.yes}</button>
+        <button class="no" id="no-${step}" type="button" tabindex="-1" aria-hidden="true">Nein</button>
+      </div>
+      <p class="hint" id="hint" aria-live="polite"></p>
+      <p class="step-label">Schritt ${step + 1} von ${questionCount}</p>`;
+    yesBtn = content.querySelector(".yes");
+    noBtn = content.querySelector(".no");
+    yesBtn.style.setProperty("--grow", 1);
+    yesBtn.onclick = () => { step++; if (step < 4) hearts(6); render(); };
+
+    // The "Nein" button can never be pressed: any approach, hover, touch, focus or click makes it hop away.
+    const stop = e => { e.preventDefault(); e.stopPropagation(); flee(e); };
+    ["pointerenter", "pointerdown", "touchstart", "mousedown", "click", "focus"].forEach(ev =>
+      noBtn.addEventListener(ev, stop, { passive: false }));
+  }
+
+  function flee(e) {
+    if (!noBtn) return;
+    const r = noBtn.getBoundingClientRect();
+    const baseX = r.left - tx, baseY = r.top - ty;
+    const pad = 16;
+    const px = e && e.clientX != null ? e.clientX : (e && e.touches && e.touches[0] ? e.touches[0].clientX : r.left + r.width / 2);
+    const py = e && e.clientY != null ? e.clientY : (e && e.touches && e.touches[0] ? e.touches[0].clientY : r.top + r.height / 2);
+    const maxX = innerWidth - r.width - pad, maxY = innerHeight - r.height - pad;
+    const yr = yesBtn.getBoundingClientRect();
+    let x, y, n = 0;
+    do {
+      x = pad + Math.random() * Math.max(1, maxX - pad);
+      y = pad + Math.random() * Math.max(1, maxY - pad);
+      n++;
+    } while (n < 40 && (
+      Math.hypot(x + r.width / 2 - px, y + r.height / 2 - py) < 170 ||
+      (x < yr.right + 10 && x + r.width > yr.left - 10 && y < yr.bottom + 10 && y + r.height > yr.top - 10)
+    ));
+    tx = x - baseX; ty = y - baseY;
+    noBtn.style.transform = `translate(${tx}px, ${ty}px) rotate(${(Math.random() * 16 - 8).toFixed(1)}deg)`;
+    tries++;
+    noBtn.textContent = noTexts[tries % noTexts.length];
+    yesBtn.style.setProperty("--grow", Math.min(1 + tries * 0.06, 1.45).toFixed(2));
+    document.getElementById("hint").textContent = hints[Math.min(tries, hints.length - 1)];
+    setMood(tries % 2 ? "oh" : "worried", 900);
+  }
+
+  // Run away as soon as the pointer gets close, so it can't even be reached.
+  let lastFlee = 0;
+  addEventListener("pointermove", e => {
+    pupils.forEach(p => {
+      const b = p.ownerSVGElement.getBoundingClientRect();
+      const dx = Math.max(-3, Math.min(3, (e.clientX - (b.left + b.width / 2)) / 60));
+      const dy = Math.max(-3, Math.min(3, (e.clientY - (b.top + b.height / 2)) / 60));
+      p.style.transform = `translate(${dx}px, ${dy}px)`;
+    });
+    if (!noBtn || e.pointerType === "touch") return;
+    const r = noBtn.getBoundingClientRect();
+    const cx = Math.max(r.left, Math.min(e.clientX, r.right));
+    const cy = Math.max(r.top, Math.min(e.clientY, r.bottom));
+    if (Math.hypot(e.clientX - cx, e.clientY - cy) < 60 && performance.now() - lastFlee > 180) {
+      lastFlee = performance.now();
+      flee(e);
+    }
+  });
+
+  // Keep the button on screen when the window changes size.
+  addEventListener("resize", () => { if (noBtn) { tx = ty = 0; noBtn.style.transform = ""; } });
+
+  function hearts(n) {
+    if (reduce) return;
+    const colors = ["#a8dbb0", "#7fbf8c", "#f6c1c7", "#e88a96", "#cfe6d1"];
+    for (let i = 0; i < n; i++) {
+      const h = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      const size = 14 + Math.random() * 20;
+      h.setAttribute("viewBox", "0 0 24 22");
+      h.setAttribute("width", size); h.setAttribute("height", size);
+      h.innerHTML = `<path d="M12 21s-9-6.2-9-12.2A5 5 0 0 1 12 6a5 5 0 0 1 9 2.8C21 14.8 12 21 12 21z" fill="${colors[i % colors.length]}"/>`;
+      h.classList.add("heart");
+      h.style.left = Math.random() * 100 + "vw";
+      h.style.animationDuration = 2.6 + Math.random() * 2.4 + "s";
+      h.style.animationDelay = Math.random() * 0.8 + "s";
+      h.style.setProperty("--rot", (Math.random() * 360 - 180) + "deg");
+      document.body.appendChild(h);
+      h.addEventListener("animationend", () => h.remove());
+    }
+  }
+
+  render();
+})();
+</script>
+
+</body>
+</html>
+
